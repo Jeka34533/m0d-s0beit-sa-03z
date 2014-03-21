@@ -331,7 +331,6 @@ void cmd_tele_locations ()
 
 	addMessageToChatWindow( "To teleport use the menu or: /m0d_tele_loc <location name>" );
 }
-
 void cmd_pickup ( char *params )
 {
 	if ( !strlen( params ) )
