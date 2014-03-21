@@ -3844,11 +3844,8 @@ void renderHandler()
 									   D3DCOLOR_ARGB(alpha, 255, 255, 255), buf );
 			}
 		}
-		Log("1");
 		renderSAMP();	// sure why not
-		Log("2");
 		renderPlayerTags();
-		Log("3");
 		if ( cheat_state->_generic.teletext )
 			RenderTeleportTexts();
 		if ( cheat_state->debug_enabled )
@@ -3866,9 +3863,7 @@ void renderHandler()
 no_render: ;
 		render->EndRender();
 	}
-	Log("6");
 	mapMenuTeleport();
-	Log("7");
 
 	traceLastFunc( "it_wasnt_us()" );
 }

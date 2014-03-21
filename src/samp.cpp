@@ -866,6 +866,18 @@ int getPlayerCount ( void )
 	return iCount + 1;
 }
 
+#define FUNC_ADDRECALL     0x7BAA0
+void AddRecallBufer(char* text) 
+{ 
+   uint32_t    func = g_dwSAMP_Addr + FUNC_ADDRECALL; 
+    _asm 
+    { 
+     mov ecx, g_Input; 
+     push text 
+     call func; 
+    } 
+}
+
 #define SAMP_FUNC_NAMECHANGE 0xA500 
 int setLocalPlayerName ( const char *name )
 {
