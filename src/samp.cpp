@@ -1840,23 +1840,6 @@ void HandleRPCPacketFunc( unsigned char byteRPCID, RPCParameters *rpcParams, voi
 				}
 			}
 		}
-		else if (byteRPCID == RPC_ServerJoin)
-		{
-			vehicle_info *vself = vehicle_info_get(VEHICLE_SELF, NULL);
-			if (vself)
-			{
-				BitStream bsData(rpcParams->input, (rpcParams->numberOfBitsOfData / 8) + 1, false);
-				short sId;
-				float fHealth;
-				bsData.Read(sId);
-				bsData.Read(fHealth);
-				if (sId == g_Players->pLocalPlayer->sCurrentVehicleID && fHealth < vself->hitpoints)
-				{
-					cheat_state_text("Warning: Server tried change your vehicle health to %0.1f", fHealth);
-					return; // exit from the function without processing RPC
-				}
-			}
-		}
 	}
 
 	functionPointer( rpcParams );
