@@ -1202,7 +1202,7 @@ static int menu_callback_cheats ( int op, struct menu_item *item )
 
 		case ID_CHEAT_POVARGEK:
 			{
-				cheat_state->stuff.check_admins ^= 1;
+			cheat_state->stuff.check_admins ^= 1;
 				break;
 			}
 		case ID_CHEAT_KEEP_TRAILER:

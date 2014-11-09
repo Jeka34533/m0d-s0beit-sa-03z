@@ -976,6 +976,23 @@ void cheat_state_text ( const char *fmt, ... )
 	cheat_state->text_time = time_get();
 }
 
+void admin_text(const char *fmt, ...)
+{
+	va_list ap;
+	if (fmt == NULL)
+	{
+		cheat_state->atext_time = 0;
+		return;
+	}
+
+	memset(cheat_state->atext, 0, sizeof(cheat_state->atext));
+
+	va_start(ap, fmt);
+	vsnprintf(cheat_state->atext, sizeof(cheat_state->atext) - 1, fmt, ap);
+	va_end(ap);
+	cheat_state->atext_time = time_get();
+}
+
 /* returns actor <id>'s struct
    if id is ACTOR_SELF (-1), the pointer to our own actor is returned */
 struct actor_info *actor_info_get ( int id, int flags )

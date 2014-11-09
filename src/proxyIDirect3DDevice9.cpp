@@ -2708,6 +2708,9 @@ void renderPlayerInfo ( int iPlayerID )
 		( y ) += 1.0f + pD3DFontFixed->DrawHeight();
 
 #ifdef M0D_DEV_ADVANCEDINFO
+		sprintf(buf, "sCurrentAnimID: %d", g_Players->pLocalPlayer->sCurrentAnimID);
+		pD3DFontFixed->PrintShadow(20.0f, y, color, buf);
+		(y) += 1.0f + pD3DFontFixed->DrawHeight();
 		sprintf( buf, "iIsWasted: %i", g_Players->pLocalPlayer->iIsWasted );
 		pD3DFontFixed->PrintShadow( 20.0f, y, color, buf );
 		( y ) += 1.0f + pD3DFontFixed->DrawHeight();
@@ -2922,6 +2925,22 @@ void renderPlayerInfo ( int iPlayerID )
 					 g_Players->pLocalPlayer->onFootData.sSurfingVehicleID );
 			pD3DFontFixed->PrintShadow( 20.0f, y, color, buf );
 			( y ) += 1.0f + pD3DFontFixed->DrawHeight();
+			sprintf(buf, "    pLocalPlayer->aimData.byteCamExtZoom: %d",
+				g_Players->pLocalPlayer->aimData.byteCamExtZoom);
+			pD3DFontFixed->PrintShadow(20.0f, y, color, buf);
+			(y) += 1.0f + pD3DFontFixed->DrawHeight();
+			sprintf(buf, "    pLocalPlayer->aimData.byteCamMode: %d",
+				g_Players->pLocalPlayer->aimData.byteCamMode);
+			pD3DFontFixed->PrintShadow(20.0f, y, color, buf);
+			(y) += 1.0f + pD3DFontFixed->DrawHeight();
+			sprintf(buf, "    pLocalPlayer->aimData.byteWeaponState: %d",
+				g_Players->pLocalPlayer->aimData.byteWeaponState);
+			pD3DFontFixed->PrintShadow(20.0f, y, color, buf);
+			(y) += 1.0f + pD3DFontFixed->DrawHeight();
+			sprintf(buf, "    pLocalPlayer->aimData.fAimZ: %f",
+				g_Players->pLocalPlayer->aimData.fAimZ);
+			pD3DFontFixed->PrintShadow(20.0f, y, color, buf);
+			(y) += 1.0f + pD3DFontFixed->DrawHeight();
 
 			if ( g_Players->pLocalPlayer->onFootData.sSurfingVehicleID != 0 )
 			{
@@ -3011,6 +3030,9 @@ void renderPlayerInfo ( int iPlayerID )
 			sprintf( buf, "Actor armor: %0.2f", g_Players->pRemotePlayer[iPlayerID]->pPlayerData->fActorArmor );
 			pD3DFontFixed->PrintShadow( 20.0f, y, color, buf );
 			( y ) += 1.0f + pD3DFontFixed->DrawHeight();
+			sprintf(buf, "Action: %d", g_Players->pRemotePlayer[iPlayerID]->pPlayerData->onFootData.byteSpecialAction);
+			pD3DFontFixed->PrintShadow(20.0f, y, color, buf);
+			(y) += 1.0f + pD3DFontFixed->DrawHeight();
 
 			if ( g_Players->pRemotePlayer[iPlayerID]->pPlayerData->pSAMP_Vehicle != NULL )
 			{
@@ -3133,7 +3155,7 @@ void renderSAMP ( void )
 		g_Vehicles = g_SAMP->pPools->pPool_Vehicle;
 		if ( isBadPtr_writeAny(g_Vehicles, sizeof(stVehiclePool)) )
 			return;
-
+		
 		g_Chat = stGetSampChatInfo();
 		if ( isBadPtr_writeAny(g_Chat, sizeof(stChatInfo)) )
 			return;
@@ -3141,11 +3163,12 @@ void renderSAMP ( void )
 		g_Input = stGetInputInfo();
 		if ( isBadPtr_writeAny(g_Input, sizeof(stInputInfo)) )
 			return;
+		
 
 		g_DeathList = stGetKillInfo();
 		if ( isBadPtr_writeAny(g_DeathList, sizeof(stKillInfo)) )
 			return;
-			
+
 		g_Dialog = stGetDialogInfo();
 
 		if ( g_SAMP->pRakClientInterface == NULL )
@@ -3153,7 +3176,7 @@ void renderSAMP ( void )
 
 		// initialize raknet
 		g_RakClient = new RakClient( g_SAMP->pRakClientInterface );
-		//g_SAMP->pRakClientInterface = new HookedRakClientInterface();//можете раскоментить
+		g_SAMP->pRakClientInterface = new HookedRakClientInterface();
 		
 		//init modCommands
 		if ( set.mod_commands_activated )
@@ -3164,13 +3187,12 @@ void renderSAMP ( void )
 		memcpy_safe((void *)0x004B35A0, (uint8_t *)"\x83\xEC\x0C\x56\x8B\xF1", 6 ); // godmode patch
 		memcpy_safe((void *)0x82C5CC, "\xC9\xC3", 2); // little anticrash patch (gta:sa)
 		
-
 		// 0x: Set's the Frame Sleeping to 0 so you get more performance (sa:mp init is so far a good place ;d) .
 		*(BYTE*)0xBAB318 = 0;  *(BYTE*)0x53E94C = 0;
 
 		g_renderSAMP_initSAMPstructs = 1;
 	}
-
+	
 	if ( g_SAMP != NULL )
 	{
 		setSAMPCustomSendRates( set.onfoot_sendrate, set.incar_sendrate, set.aim_sendrate, set.headsync_sendrate );
@@ -3843,9 +3865,24 @@ void renderHandler()
 				pD3DFont->PrintShadow( pPresentParam.BackBufferWidth - pD3DFont->DrawLength(buf) - 3.0f, 1,
 									   D3DCOLOR_ARGB(alpha, 255, 255, 255), buf );
 			}
+			if (cheat_state->atext_time > 0 && time_get() - cheat_state->atext_time < MSEC_TO_TIME(3000))
+			{
+				uint32_t	color, alpha = 255;
+
+				if (time_get() - cheat_state->atext_time > MSEC_TO_TIME(2000))
+					alpha -= (time_get() - cheat_state->atext_time - MSEC_TO_TIME(2000)) * 255 / MSEC_TO_TIME(1000);
+
+				color = D3DCOLOR_ARGB(alpha, 71, 255, 0);
+
+				_snprintf_s(buf, sizeof(buf) - 1, "%s", cheat_state->atext);
+				pD3DFont->PrintShadow(1, pPresentParam.BackBufferHeight / 2,
+					D3DCOLOR_ARGB(alpha, 71, 255, 0), buf);
+			}
 		}
+
 		renderSAMP();	// sure why not
 		renderPlayerTags();
+ 
 		if ( cheat_state->_generic.teletext )
 			RenderTeleportTexts();
 		if ( cheat_state->debug_enabled )
@@ -3863,6 +3900,7 @@ void renderHandler()
 no_render: ;
 		render->EndRender();
 	}
+
 	mapMenuTeleport();
 
 	traceLastFunc( "it_wasnt_us()" );

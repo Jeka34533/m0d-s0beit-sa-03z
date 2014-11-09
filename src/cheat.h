@@ -286,6 +286,8 @@ struct admins {
 struct cheat_state
 {
 	int							state;	/* CHEAT_STATE_* */
+	int							atext_time;
+	char						atext[64];
 	struct cheat_state_actor	actor;
 	struct cheat_state_vehicle	vehicle;
 	struct cheat_state_generic	_generic;

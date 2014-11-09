@@ -36,21 +36,24 @@
 #define MAX_CLIENTCMDS				144
 #define SAMP_MENUS_MAX				128
 
-#define SAMP_CHAT_INFO_OFFSET			0x212A6C 
-#define SAMP_CHAT_INPUT_INFO_OFFSET     	0x212A70 
-#define SAMP_KILL_INFO_OFFSET			0x212A74 
-#define SAMP_INFO_OFFSET    			0x212A80 
-#define SAMP_DIALOG_INFO_OFFSET			0x212A40 
+#define SAMP_CHAT_INFO_OFFSET			0x212AA4 //0.3z R2
+#define SAMP_CHAT_INPUT_INFO_OFFSET     0x212AA8 //0.3z R2
+#define SAMP_KILL_INFO_OFFSET			0x212AAC //0.3z R2 
+#define SAMP_INFO_OFFSET    			0x212AB8 //0.3z R2
+#define SAMP_DIALOG_INFO_OFFSET			0x212A78 //0.3z R2
 
-#define SAMP_COLOR_OFFSET				0x1FA378 
-#define VALUE_DRAWING_DISTANCE			0xCECF4 
+#define SAMP_FONT_OFFSET				0xD2D40 //0.3z R2
+
+#define SAMP_COLOR_OFFSET				0x20FD48 //0.3z R2 
+#define VALUE_DRAWING_DISTANCE			0xCECF0 //0.3z R1 (don't change)
 
 // used in proxyIDirect3DDevice9.cpp
-#define SAMP_SCOREBOARD_INFO			0x212A3C 
-#define SAMP_GAMEPROCESSHOOK			0x657FA  
-#define SAMP_FUNCUPDATESCOREBOARDDATA   0x7D10 
-#define SAMP_PATCH_NOCARCOLORRESETTING	0x77400  
-#define SAMP_DRAWTEXTLABELS				0x86B5C 
+#define SAMP_SCOREBOARD_INFO			0x212A74 //0.3z R2
+#define SAMP_FUNCUPDATESCOREBOARDDATA   0x7C50 //0.3z R2
+#define SAMP_PATCH_NOCARCOLORRESETTING	0xABA30 //0.3z R2
+#define SAMP_DRAWTEXTLABELS				0x6E0E1 //0.3z R2
+
+//#define SAMP_GAMEPROCESSHOOK			0x657FA //уже в истории
 
 #define GAMESTATE_AWAIT_JOIN			12
 #define GAMESTATE_RESTARTING			17
@@ -59,11 +62,11 @@
 #define GAMESTATE_CONNECTED				13
 
 #define PLAYER_STATE_NONE				0
-#define PLAYER_STATE_ONFOOT				33
-#define PLAYER_STATE_DRIVER				35
-#define PLAYER_STATE_PASSENGER			34
-#define PLAYER_STATE_WASTED				64
-#define PLAYER_STATE_SPAWNED			65
+#define PLAYER_STATE_ONFOOT				17
+#define PLAYER_STATE_PASSENGER			18
+#define PLAYER_STATE_DRIVER				19
+#define PLAYER_STATE_WASTED				32
+#define PLAYER_STATE_SPAWNED			33
 
 #define PLAYER_MARKERS_MODE_OFF			0
 #define PLAYER_MARKERS_MODE_GLOBAL		1
@@ -89,7 +92,7 @@
 #define SPECIAL_ACTION_CUFFED			24
 #define SPECIAL_ACTION_CARRY			25
 
-// SAMP STRUCTURES by Pushok
+// SAMP STRUCTURES by Pushok (0.3z R1) | SAMP STRUCTURES by povargek (0.3z R2)
 
 struct stSAMPPools
 {
@@ -212,21 +215,21 @@ struct stPickupPool
 struct stPlayerPool
 {
 #pragma pack( 1 )
- uint32_t    iEmpty;
- uint16_t    sLocalPlayerID;
- void     *pVTBL_txtHandler;
+ uint32_t    iEmpty; // +0
+ uint16_t    sLocalPlayerID; // +4
+ void     *pVTBL_txtHandler; // +6
  union
  {
   char szLocalPlayerName[16];
   char *pszLocalPlayerName;
- };
- int      iStrlen_LocalPlayerName;
- int      iScoreboard_something;
- struct stLocalPlayer *pLocalPlayer;
- int      iLocalPlayerPing;
- int      iLocalPlayerScore;
- struct stRemotePlayer *pRemotePlayer[SAMP_PLAYER_MAX];
- int      iIsListed[SAMP_PLAYER_MAX];
+ };  // +10
+ int      iStrlen_LocalPlayerName;  // +26
+ int      iScoreboard_something;  // +30
+ struct stLocalPlayer *pLocalPlayer;  // +34
+ int      iLocalPlayerPing;  // +38
+ int      iLocalPlayerScore; // +42
+ struct stRemotePlayer *pRemotePlayer[SAMP_PLAYER_MAX]; // +46
+ int      iIsListed[SAMP_PLAYER_MAX]; // +4062
 };
 
 struct stSAMPKeys
@@ -250,7 +253,7 @@ struct stSAMPKeys
 	uint8_t keys__unused : 1;
 };
 
-struct stOnFootData
+struct stOnFootData //0x44
 {
 #pragma pack( 1 )
 	uint16_t	sLeftRightKeys;
@@ -272,7 +275,7 @@ struct stOnFootData
 	int			iCurrentAnimationID;
 };
 
-struct stInCarData
+struct stInCarData //size 0x3F
 {
 #pragma pack( 1 )
 	uint16_t	sVehicleID;
@@ -300,7 +303,7 @@ struct stInCarData
 	};
 };
 
-struct stAimData
+struct stAimData //size 0x20
 {
 #pragma pack( 1 )
 	BYTE byteCamMode;
@@ -312,7 +315,7 @@ struct stAimData
 	BYTE bUnk;
 };
 
-struct stTrailerData
+struct stTrailerData //size 0x36
 {
 #pragma pack( 1 )
 	uint16_t	sTrailerID;
@@ -323,7 +326,7 @@ struct stTrailerData
 	uint32_t	pad; // fix alignment
 };
 
-struct stPassengerData
+struct stPassengerData //size 0x1E
 {
 #pragma pack( 1 )
 	uint16_t	sVehicleID;
@@ -364,7 +367,7 @@ struct stSurfData
 	int			iSurfMode;	//0 = not surfing, 1 = moving (unstable surf), 2 = fixed on vehicle
 };
 
-struct stHeadSync
+struct stHeadSync // size 0x14
 {
 #pragma pack( 1 )
 	float	fHeadSync[3];
@@ -375,19 +378,20 @@ struct stHeadSync
 struct stLocalPlayer
 {
 #pragma pack( 1 )
-	int						iIsActorAlive;	
-	int						iIsWasted;
-	uint16_t				sCurrentVehicleID;
-	uint16_t				sLastVehicleID;
-	int						iCurrentAnimID;
-	int						iIsActive;	
-	struct stSAMPPed		*pSAMP_Actor;
-	struct stAimData		aimData; 	
-	struct stOnFootData		onFootData;
-	struct stPassengerData	passengerData;
-	struct stTrailerData	trailerData;
-	struct stInCarData		inCarData;
-	struct stHeadSync		headSyncData;		
+	struct stSAMPPed		*pSAMP_Actor; // +0
+	int						iIsActorAlive; // +4
+	int						iIsWasted; // +8
+	uint16_t				sCurrentVehicleID;  // +12
+	uint16_t				sLastVehicleID;  // +16
+	uint16_t				sCurrentAnimID; // +18
+	uint16_t				sUnk1; // +20
+	int						iIsActive; // +24
+	struct stAimData		aimData; // +60
+	struct stOnFootData		onFootData; // +128
+	struct stPassengerData	passengerData; // +152
+	struct stTrailerData	trailerData; // +206
+	struct stInCarData		inCarData; // +269
+	struct stHeadSync		headSyncData; // +289 
 	uint32_t				ulSendTick;
 	uint8_t					byteTeamID;
 	int						iSpawnSkin;
@@ -411,7 +415,7 @@ struct stLocalPlayer
 	uint8_t					byteCurrentWeapon;
 	uint8_t					byteWeaponInventory[13];
 	int						iWeaponAmmo[13];	
-	struct stSurfData		surfData;
+	struct stSurfData		surfData; // +2C6 ?
 	int						iPassengerDriveBy;	
 	uint8_t					byteCurrentInterior;
 	int						iIsInRCVehicle;
@@ -440,39 +444,37 @@ struct stRemotePlayerData
 #pragma pack( 1 )
 	uint16_t				sPlayerID;
 	uint16_t				sVehicleID;
-	uint8_t					byteTeamID; 
-	uint8_t					bytePlayerState;
-	uint8_t					byteSeatID;
-	uint32_t				ulUnknownZero2;
-	int						iPassengerDriveBy;
-	struct stSAMPVehicle	*pSAMP_Vehicle;
-	struct stSAMPPed		*pSAMP_Actor; 
 	uint8_t					byteUnknown1[40];
 	float					fOnFootPos[3];
 	float					fOnFootMoveSpeed[3];
 	float					fVehiclePosition[3];
 	float					fVehicleMoveSpeed[3];
-	float					fVehicleRoll[4];
-	int						iShowNameTag;
-	int						iHasJetPack; 	
-	uint8_t					byteSpecialAction;
-	struct stTrailerData	trailerData;
-	struct stPassengerData	passengerData;
-	struct stAimData		aimData; 
-	struct stInCarData		inCarData;
-	struct stOnFootData		onFootData;
-	//270	
-	uint32_t				ulUnknown1; 
-	int						iUnknown2[2];
-	uint8_t					Unknown__;
+	uint8_t					byteTeamID; //+5C
+	uint8_t					bytePlayerState; //+5D
+	uint8_t					byteSeatID; //+5E
+	uint32_t				ulUnknownZero2; //+62
+	int						iPassengerDriveBy; //+66
+	struct stSAMPVehicle	*pSAMP_Vehicle; //+6A
+	struct stSAMPPed		*pSAMP_Actor; //+6E
+	uint32_t				ulUnknown1; //+72
+	int						iUnknown2[2]; //+7A
+	uint8_t					Unknown__;  //+7B
+	int						iShowNameTag; //+7F
+	int						iHasJetPack; //+83
+	uint8_t					byteUnk1[3]; //+86
+	uint8_t					byteSpecialAction; //+87
+	struct stAimData		aimData;//+A7
+	struct stInCarData		inCarData;//+E6
+	struct stOnFootData		onFootData;//+12A
+	struct stTrailerData	trailerData;//??? not tested
+	struct stPassengerData	passengerData;//??? not tested
 	float					fActorHealth; 
 	float					fActorArmor;
-	
 	//aimdata headdata probably wrong
 	uint32_t				dwLastStreamedInTick; // is 0 when currently streamed in
 	int						iGlobalMarkerLoaded;
 	struct stHeadSync		headSyncData;
-	
+	float					fVehicleRoll[4];
 	uint32_t				dwTick;	
 	int						iGlobalMarkerLocation[3];
 	uint32_t				ulGlobalMarker_GTAID;
@@ -481,18 +483,19 @@ struct stRemotePlayerData
 struct stRemotePlayer 
 {
 #pragma pack( 1 )
- int     iIsNPC;
- int     iScore;
- stRemotePlayerData *pPlayerData;
- int     iPing;
- void    *pVTBL_txtHandler;
+ uint8_t	bUnk1[3]; // +0
+ int	 iScore; // +3
+ stRemotePlayerData *pPlayerData; // +8
+ int     iIsNPC; // +12 (?)
+ int     iPing; // +16
+ void    *pVTBL_txtHandler; // +20
  union
  {
   char szPlayerName[16];
   char *pszPlayerName;
- };
- int     iStrlenName__; // ?
- int     iStrlenName; // iStrlenNameMax, numByteReserved?   
+ }; // +24
+ int     iStrlenName; // iStrlenNameMax, numByteReserved?
+ int     iStrlenName__; // +40
 };
 
 struct stSAMPPed
@@ -743,6 +746,7 @@ int												isBadPtr_SAMP_iPlayerID ( int iPlayerID );
 
 void											getSamp ();
 uint32_t										getSampAddress ();
+void											SetupSAMPHook(char *szName, DWORD dwFuncOffset, void *Func, int iType, int iSize, char *szCompareBytes);
 
 struct stSAMP									*stGetSampInfo ( void );
 struct stChatInfo								*stGetSampChatInfo ( void );

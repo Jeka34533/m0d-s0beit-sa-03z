@@ -25,7 +25,7 @@
 #include "main.h"
 
 #define SAMP_DLL		"samp.dll"
-#define SAMP_CMP		"8D4C2424518D4C242CAA" 
+#define SAMP_CMP		"51528D8C244401000051" 
 
 //randomStuff
 extern int						iViewingInfoPlayer;
@@ -331,6 +331,7 @@ void cmd_tele_locations ()
 
 	addMessageToChatWindow( "To teleport use the menu or: /m0d_tele_loc <location name>" );
 }
+
 void cmd_pickup ( char *params )
 {
 	if ( !strlen( params ) )
@@ -474,9 +475,9 @@ void getSamp ()
 
 		if ( g_dwSAMP_Addr != NULL )
 		{
-			if ( memcmp_safe((uint8_t *)g_dwSAMP_Addr + 0xBB7F, hex_to_bin(SAMP_CMP), 10) )
+			if ( memcmp_safe((uint8_t *)g_dwSAMP_Addr + 0xBB75, hex_to_bin(SAMP_CMP), 10) )
 			{
-				strcpy(g_szSAMPVer, "SA:MP 0.3z");
+				strcpy(g_szSAMPVer, "SA:MP 0.3z-R2");
 				Log( "%s was detected. g_dwSAMP_Addr: 0x%p", g_szSAMPVer, g_dwSAMP_Addr );
 
 				// anticheat patch
@@ -484,26 +485,19 @@ void getSamp ()
     				{
       					"Anticheat patch", 0, 0,
       					{
-       						{ 1, (void *)( g_dwSAMP_Addr + 0x61430 ), NULL, (uint8_t *)"\xC3", 0 }, // 0.3z
+							{ 1, (void *)(g_dwSAMP_Addr + 0x957D0), NULL, (uint8_t *)"\xC3", 0 }, // 0.3z
       					}
     				};
     				patcher_install( &fuckAC );
-
-				//DWORD ACPatchOffsets[] =
-				//{
-				//	0x0005B241, 0x002A048F, 0x002A1770, 0x0001277F, 0x000AD4B3, 0x002890C3, 0x0028FD62, 
-				//	0x00293C76, 0x0029D936, 0x0026F40C, 0x00263839, 0x0024E8F4, 0x002F2343
-				//};
-				//DWORD ACPatchOffsets2[] = 
-				//{
-				//	0x00015064, 0x00261D1D, 0x0026E444, 0x0027CAA4, 0x00286CD6, 0x002EDBEE, 0x00301174
-				//};
-				//static DWORD ACC[2] = { 0, 0 };
-				//DWORD *pACC[] = { &ACC[0], &ACC[2] };
-				//for ( int i = 0; i < sizeof( ACPatchOffsets ) / sizeof( DWORD ); i++ )
-				//	memcpy_safe( (void *)( g_dwSAMP_Addr + ACPatchOffsets[i] ), &pACC[0], 4 );
-				//for ( int i = 0; i < sizeof( ACPatchOffsets2 ) / sizeof( DWORD ); i++ )
-				//	memcpy_safe( (void *)( g_dwSAMP_Addr + ACPatchOffsets2[i] ), &pACC[1], 4 );
+					
+					if (set.useuserfont)
+					{
+						BYTE FontPatch[] =
+						{
+							0x67, 0x74, 0x61, 0x73, 0x61
+						};
+						memcpy_safe((void *)(g_dwSAMP_Addr + SAMP_FONT_OFFSET), FontPatch, 5); // user's font
+					}
 
 				iIsSAMPSupported = 1;
 			}
@@ -866,19 +860,19 @@ int getPlayerCount ( void )
 	return iCount + 1;
 }
 
-#define FUNC_ADDRECALL     0x7BAA0
-void AddRecallBufer(char* text) 
-{ 
-   uint32_t    func = g_dwSAMP_Addr + FUNC_ADDRECALL; 
-    _asm 
-    { 
-     mov ecx, g_Input; 
-     push text 
-     call func; 
-    } 
+#define FUNC_ADDRECALL 0x63060 //0.3z R2
+void AddRecallBufer(char* text)
+{
+	uint32_t func = g_dwSAMP_Addr + FUNC_ADDRECALL;
+	_asm
+	{
+	mov ecx, g_Input;
+	push text
+	call func;
+	}
 }
 
-#define SAMP_FUNC_NAMECHANGE 0xA500 
+#define SAMP_FUNC_NAMECHANGE 0xA440 //0.3z R2 
 int setLocalPlayerName ( const char *name )
 {
 	if ( g_Players == NULL || g_Players->pLocalPlayer == NULL )
@@ -1188,7 +1182,7 @@ void cmd_showCMDS ()
 	}
 }
 
-#define FUNC_ADDCLIENTCMD	0x7BC40 
+#define FUNC_ADDCLIENTCMD	0x63200 //0.3z R2 
 void addClientCommand ( char *name, int function )
 {
 	if ( name == NULL || function == NULL || g_Input == NULL )
@@ -1328,7 +1322,7 @@ void addMessageToChatWindowSS ( const char *text, ... )
 	}
 }
 
-#define FUNC_ADDTOCHATWND	0x7A4F0 
+#define FUNC_ADDTOCHATWND	0x61AB0 //0.3z R2  
 void addToChatWindow ( char *text, D3DCOLOR textColor, int playerID )
 {
 	if ( g_SAMP == NULL || g_Chat == NULL )
@@ -1374,7 +1368,7 @@ void addToChatWindow ( char *text, D3DCOLOR textColor, int playerID )
 	return;
 }
 
-#define FUNC_RESTARTGAME	0x9280 
+#define FUNC_RESTARTGAME	0x91C0 //0.3z R2   
 void restartGame ()
 {
 	if ( g_SAMP == NULL )
@@ -1411,8 +1405,8 @@ void say ( char *text, ... )
 	addSayToChatWindow( tmp );
 }
 
-#define FUNC_SAY		0x4CA0
-#define FUNC_SENDCMD	0x7BDD0
+#define FUNC_SAY		0x4C30 //0.3z R2 
+#define FUNC_SENDCMD	0x63390 //0.3z R2 
 void addSayToChatWindow ( char *msg )
 {
 	if ( g_SAMP == NULL )
@@ -1441,7 +1435,7 @@ void addSayToChatWindow ( char *msg )
 	}
 }
 
-#define FUNC_GAMETEXT	0x643B0 
+#define FUNC_GAMETEXT	0x98720 //0.3z R2  
 void showGameText ( char *text, int time, int textsize )
 {
 	if ( g_SAMP == NULL )
@@ -1454,7 +1448,7 @@ void showGameText ( char *text, int time, int textsize )
 	__asm call func
 }
 
-#define FUNC_SPAWN			0x36D0 
+#define FUNC_SPAWN			0x3690 //0.3z R2   
 void playerSpawn ( void )
 {
 	if ( g_SAMP == NULL )
@@ -1499,7 +1493,7 @@ void setPassword ( char *password )
 	__asm pop eax
 }
 
-#define FUNC_SENDINTERIOR	0x4BF0 
+#define FUNC_SENDINTERIOR	0x4B80 //0.3z R2   
 void sendSetInterior ( uint8_t interiorID )
 {
 	if ( g_SAMP == NULL )
@@ -1514,7 +1508,7 @@ void sendSetInterior ( uint8_t interiorID )
 	__asm pop ecx
 }
 
-#define FUNC_SETSPECIALACTION	0x2C70 // 0.3z-RC3 by iMaddy
+#define FUNC_SETSPECIALACTION	0x2C70 // 0.3z-RC3 by iMaddy (dont't change)
 void setSpecialAction ( uint8_t byteSpecialAction )
 {
 	if ( g_SAMP == NULL )
@@ -1567,8 +1561,8 @@ void _cdecl toggleSAMPCursor_RestoreCamera ( void )
 }
 */
 
-#define FUNC_TOGGLECURSOR               0x63E20 
-#define FUNC_CURSORUNLOCKACTORCAM       0x63D00 
+#define FUNC_TOGGLECURSOR               0x98190 //0.3z R2    
+#define FUNC_CURSORUNLOCKACTORCAM       0x98070 //0.3z R2 
 void toggleSAMPCursor(int iToggle)
 {
 	if(g_Input->iInputEnabled) return;
@@ -1607,7 +1601,7 @@ void toggleSAMPCursor(int iToggle)
 	}
 }
 
-#define HOOK_EXIT_ANTICARJACKED_HOOK    0x1131C 
+#define HOOK_EXIT_ANTICARJACKED_HOOK    0x1125C //0.3z R2  
 uint16_t	anticarjacked_vehid;
 DWORD		anticarjacked_ebx_backup;
 DWORD		anticarjacked_jmp;
@@ -1633,7 +1627,7 @@ uint8_t _declspec ( naked ) carjacked_hook ( void )
 	__asm jmp anticarjacked_jmp
 }
 
-#define HOOK_EXIT_SERVERMESSAGE_HOOK	0x7AAD1 
+#define HOOK_EXIT_SERVERMESSAGE_HOOK	0x62091 //0.3z R2 
 int		g_iNumPlayersMuted = 0;
 bool	g_bPlayerMuted[SAMP_PLAYER_MAX];
 uint8_t _declspec ( naked ) server_message_hook ( void )
@@ -1689,7 +1683,7 @@ ignoreThisServChatMsg:
 	__asm jmp ebx
 }
 
-#define HOOK_EXIT_CLIENTMESSAGE_HOOK	0xDEC8 
+#define HOOK_EXIT_CLIENTMESSAGE_HOOK	0xDE18 //0.3z R2 
 uint8_t _declspec ( naked ) client_message_hook ( void )
 {
 	static char last_clientmsg[SAMP_PLAYER_MAX][256];
@@ -1737,7 +1731,7 @@ client_message_hook_jump_out:;
 	__asm jmp ebx
 }
 
-#define HOOK_CALL_STREAMEDOUTINFO	0x64430 
+#define HOOK_CALL_STREAMEDOUTINFO	0x987A0 //0.3z R2 
 DWORD dwStreamedOutInfoOrigFunc;
 float fStreamedOutInfoPosX, fStreamedOutInfoPosY, fStreamedOutInfoPosZ;
 uint16_t wStreamedOutInfoPlayerID;
@@ -1779,10 +1773,38 @@ uint8_t _declspec ( naked ) StreamedOutInfo ( void )
 void HandleRPCPacketFunc( unsigned char byteRPCID, RPCParameters *rpcParams, void ( *functionPointer ) ( RPCParameters * ) )
 {
 	// use this if you wanna log received RPCs (can help you with finding samp RPC-patches)
-	if ( byteRPCID != RPC_UpdateScoresPingsIPs )
+	/*if ( byteRPCID != RPC_UpdateScoresPingsIPs )
 	{
 		int len = rpcParams ? rpcParams->numberOfBitsOfData / 8 : 0;
 		addMessageToChatWindow( "> [RPC Recv] id: %d, func offset: %p, len: %d", byteRPCID, (DWORD)functionPointer - g_dwSAMP_Addr, len );
+	}*/
+	if (byteRPCID == RPC_ServerJoin && rpcParams)
+	{
+		if (!cheat_state->_generic.cheat_panic_enabled)
+		{
+			if (g_SAMP->iGameState == GAMESTATE_CONNECTED)
+			{
+				if (cheat_state->stuff.check_admins == 0)
+				{
+					BitStream bsData(rpcParams->input, (rpcParams->numberOfBitsOfData / 8) + 1, false);
+					CHAR szPlayerName[24];
+					USHORT playerId;
+					BYTE byteNameLen = 0;
+					memset_safe(szPlayerName, 0x0, sizeof(szPlayerName));
+					bsData.Read(playerId);
+					int iNPC = 0;//?
+					bsData.Read(iNPC);
+					BYTE bUnk = 0;
+					bsData.Read(bUnk);
+					bsData.Read(byteNameLen);
+					if (byteNameLen > 20 || byteNameLen < 3) return;
+					bsData.Read(szPlayerName, byteNameLen);
+					if (!strlen(szPlayerName)) return;
+					if (playerId < 0 || playerId > SAMP_PLAYER_MAX) return;
+					admin_text(" -> %s[ %d ] connect", szPlayerName, playerId);
+				}
+			}
+		}
 	}
 	if ( set.enable_extra_godmode && cheat_state->_generic.hp_cheat && rpcParams )
 	{
@@ -1818,13 +1840,30 @@ void HandleRPCPacketFunc( unsigned char byteRPCID, RPCParameters *rpcParams, voi
 				}
 			}
 		}
+		else if (byteRPCID == RPC_ServerJoin)
+		{
+			vehicle_info *vself = vehicle_info_get(VEHICLE_SELF, NULL);
+			if (vself)
+			{
+				BitStream bsData(rpcParams->input, (rpcParams->numberOfBitsOfData / 8) + 1, false);
+				short sId;
+				float fHealth;
+				bsData.Read(sId);
+				bsData.Read(fHealth);
+				if (sId == g_Players->pLocalPlayer->sCurrentVehicleID && fHealth < vself->hitpoints)
+				{
+					cheat_state_text("Warning: Server tried change your vehicle health to %0.1f", fHealth);
+					return; // exit from the function without processing RPC
+				}
+			}
+		}
 	}
 
 	functionPointer( rpcParams );
 }
 
 DWORD dwTemp1, dwTemp2;
-#define SAMP_HOOKEXIT_HANDLE_RPC  0x35013 
+#define SAMP_HOOKEXIT_HANDLE_RPC  0x34F93 //0.3z R2 
 uint8_t _declspec ( naked ) hook_handle_rpc_packet ( void )
 {
 	__asm pushad;
@@ -1841,7 +1880,7 @@ uint8_t _declspec ( naked ) hook_handle_rpc_packet ( void )
 	__asm jmp dwTemp1;
 }
 
-#define SAMP_HOOKEXIT_HANDLE_RPC2	0x35021  
+#define SAMP_HOOKEXIT_HANDLE_RPC2	0x34FA1 //0.3z R2 
 uint8_t _declspec ( naked ) hook_handle_rpc_packet2 ( void )
 {
 	__asm pushad;
@@ -1856,6 +1895,17 @@ uint8_t _declspec ( naked ) hook_handle_rpc_packet2 ( void )
 	__asm jmp dwTemp1;
 }
 
+#define FUNC_CNETGAMEDESTRUCTOR                 0x8520 //0.3z R2 
+void __stdcall CNetGame__destructor(void)
+{
+	// release hooked rakclientinterface, restore original rakclientinterface address and call CNetGame destructor
+	if (g_SAMP->pRakClientInterface != NULL)
+		delete g_SAMP->pRakClientInterface;
+	g_SAMP->pRakClientInterface = g_RakClient->GetRakClientInterface();
+	return ((void(__thiscall *) (void *)) (g_dwSAMP_Addr + FUNC_CNETGAMEDESTRUCTOR))(g_SAMP);
+}
+
+
 void SetupSAMPHook( char *szName, DWORD dwFuncOffset, void *Func, int iType, int iSize, char *szCompareBytes )
 {
 	CDetour api;
@@ -1869,19 +1919,22 @@ void SetupSAMPHook( char *szName, DWORD dwFuncOffset, void *Func, int iType, int
 	}
 	else
 	{
-		Log( "Failed to hook %s (memcmp)", szName );
+		Log("Failed to hook %s (memcmp)", szName );
 	}
 
 	if ( bytes )
 		free( bytes );
 }
 
-#define SAMP_HOOKPOS_ServerMessage          0x7AABA 
-#define SAMP_HOOKPOS_ClientMessage          0xDE6E 
-#define SAMP_HOOK_STATECHANGE               0x1130B 
-#define SAMP_HOOK_StreamedOutInfo           0xF82A 
-#define SAMP_HOOKENTER_HANDLE_RPC			0x3500D 
-#define SAMP_HOOKENTER_HANDLE_RPC2			0x34F99 
+#define SAMP_HOOKPOS_ServerMessage          0x6207A //0.3z R2  
+#define SAMP_HOOKPOS_ClientMessage          0xDDBE //0.3z R2  
+#define SAMP_HOOK_STATECHANGE               0x1124B //0.3z R2 
+#define SAMP_HOOK_StreamedOutInfo           0xF76A //0.3z R2 
+#define SAMP_HOOKENTER_HANDLE_RPC			0x34F8D //0.3z R2
+#define SAMP_HOOKENTER_HANDLE_RPC2			0x34F19 //0.3z R2
+#define SAMP_HOOKENTER_CNETGAME_DESTR       0xAD3D3 //0.3z R2
+#define SAMP_HOOKENTER_CNETGAME_DESTR2      0xAE562 //0.3z R2
+
 void installSAMPHooks ()
 {
 	if( g_SAMP == NULL )
@@ -1899,8 +1952,13 @@ void installSAMPHooks ()
 	}
 
 	SetupSAMPHook( "StreamedOutInfo", SAMP_HOOK_StreamedOutInfo, StreamedOutInfo, DETOUR_TYPE_CALL_FUNC, 5, "E8" );
-	//SetupSAMPHook( "HandleRPCPacket", SAMP_HOOKENTER_HANDLE_RPC, hook_handle_rpc_packet, DETOUR_TYPE_JMP, 6, "FF570183C404" );
-	//SetupSAMPHook( "HandleRPCPacket2", SAMP_HOOKENTER_HANDLE_RPC2, hook_handle_rpc_packet2, DETOUR_TYPE_JMP, 6, "FF5701E980000000" );
+	SetupSAMPHook( "HandleRPCPacket", SAMP_HOOKENTER_HANDLE_RPC, hook_handle_rpc_packet, DETOUR_TYPE_JMP, 6, "FF570183C404" );
+	SetupSAMPHook( "HandleRPCPacket2", SAMP_HOOKENTER_HANDLE_RPC2, hook_handle_rpc_packet2, DETOUR_TYPE_JMP, 6, "FF5701E980000000" );
+	//FYP's crash fix
+	SetupSAMPHook("CNETGAMEDESTR1", SAMP_HOOKENTER_CNETGAME_DESTR, CNetGame__destructor, DETOUR_TYPE_CALL_FUNC, 5, "E8");
+	SetupSAMPHook("CNETGAMEDESTR2", SAMP_HOOKENTER_CNETGAME_DESTR2, CNetGame__destructor, DETOUR_TYPE_CALL_FUNC, 5, "E8");
+	//FYP's crash fix
+
 }
 
 #define SAMP_ONFOOTSENDRATE		0xE6098 // at 1000369A  MOV ECX,DWORD PTR DS:[100E6098]
@@ -1921,8 +1979,8 @@ void setSAMPCustomSendRates ( int iOnFoot, int iInCar, int iAim, int iHeadSync )
 	memcpy_safe( (void *)(g_dwSAMP_Addr + SAMP_AIMSENDRATE), &iAim, sizeof(int) );
 }
 
-#define SAMP_DISABLE_NAMETAGS           0x86770 
-#define SAMP_DISABLE_NAMETAGS_HP        0x85670 
+#define SAMP_DISABLE_NAMETAGS           0x6C8B0 //0.3z R2
+#define SAMP_DISABLE_NAMETAGS_HP        0x6D9B0 //0.3z R2
 int sampPatchDisableNameTags ( int iEnabled )
 {
 	static struct patch_set sampPatchEnableNameTags_patch =
@@ -1942,7 +2000,7 @@ int sampPatchDisableNameTags ( int iEnabled )
 	return NULL;
 }
 
-#define SAMP_SKIPSENDINTERIOR 0x68C9
+#define SAMP_SKIPSENDINTERIOR 0x68EA //0.3z R2
 int sampPatchDisableInteriorUpdate ( int iEnabled )
 {
 	static struct patch_set sampPatchDisableInteriorUpdate_patch =
@@ -1962,8 +2020,8 @@ int sampPatchDisableInteriorUpdate ( int iEnabled )
 	return NULL;
 }
 
-#define SAMP_NOPSCOREBOARDTOGGLEON			0x80D80 
-#define SAMP_NOPSCOREBOARDTOGGLEONKEYLOCK	0x81040 
+#define SAMP_NOPSCOREBOARDTOGGLEON			0x67FC0 //0.3z R2 
+#define SAMP_NOPSCOREBOARDTOGGLEONKEYLOCK	0x68280 //0.3z R2 
 int sampPatchDisableScoreboardToggleOn ( int iEnabled )
 {
 	static struct patch_set sampPatchDisableScoreboard_patch =
@@ -1983,8 +2041,8 @@ int sampPatchDisableScoreboardToggleOn ( int iEnabled )
 	return NULL;
 }
 
-#define SAMP_CHATINPUTADJUST_Y    0x80D80 // 0.3z R1 (by iMaddy)
-#define SAMP_CHATINPUTADJUST_X    0x7B9E5 // 0.3z R1 (by iMaddy)
+#define SAMP_CHATINPUTADJUST_Y                          0x61A86 //0.3z R2
+#define SAMP_CHATINPUTADJUST_X                          0x62FA5 //0.3z R2
 int sampPatchDisableChatInputAdjust ( int iEnabled )
 {
 	static struct patch_set sampPatchDisableChatInputAdj_patch =
@@ -2004,7 +2062,7 @@ int sampPatchDisableChatInputAdjust ( int iEnabled )
 	return NULL;
 }
 
-#define FUNC_DEATH 0x4BF0 // 0.3z R1 (by iMaddy)
+#define FUNC_DEATH 0x4B80 //0.3z R2
 void sendDeath ( void )
 {
 	if ( g_SAMP == NULL )
@@ -2018,8 +2076,8 @@ void sendDeath ( void )
 	__asm pop ecx
 }
  
-#define FUNC_ENCRYPT_PORT 0x19870 
-#define SAMP_ENCRYPED_PORT_OFFSET 0xFEA38
+#define FUNC_ENCRYPT_PORT 0x197C0 //0.3z R2
+#define SAMP_ENCRYPED_PORT_OFFSET 0xFE93C //0.3z R2
 void changeServer( const char *pszIp, unsigned ulPort, const char *pszPassword )
 {
 	if ( !g_SAMP )
@@ -2029,7 +2087,7 @@ void changeServer( const char *pszIp, unsigned ulPort, const char *pszPassword )
 	( ( void ( __cdecl * )( unsigned ) )( g_dwSAMP_Addr + FUNC_ENCRYPT_PORT ) )( ulPort );
 
 	// 2st version
-	// *(unsigned short *)( g_dwSAMP_Addr + SAMP_ENCRYPED_PORT_OFFSET ) = ( ulPort + 1 ) ^ 0x5555;
+	// *(unsigned short *)( g_dwSAMP_Addr + SAMP_ENCRYPED_PORT_OFFSET ) = ( ulPort + 1 ) ^ 0xCCCC; // 0x5555 -> 0xCCCC
 
 	disconnect( 500 );
 	strcpy( g_SAMP->szIP, pszIp );

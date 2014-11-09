@@ -499,7 +499,7 @@ void cheat_hook ( HWND wnd )
 	if ( g_SAMP && g_renderSAMP_initSAMPstructs )
 		sampMainCheat();
 
-	if ( (cheat_state->stuff.check_admins == 1) && !KEY_DOWN(VK_TAB))
+	if ( (cheat_state->stuff.check_admins == 0) && !KEY_DOWN(VK_TAB))
 			check_admins();
  
 

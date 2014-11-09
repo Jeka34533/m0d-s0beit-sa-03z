@@ -6,8 +6,8 @@
 !define MUI_INSTFILESPAGE_PROGRESSBAR colored
 !define NAME 'mod_sa'
 !define MP 'SA-MP'
-!define MP_VERSION 'v0.3z R1'
-!define VERSION 'v4.3.3.3(v0.7 R1-2) by Pushok, povargek, iMaddy'
+!define MP_VERSION 'v0.3z R2'
+!define VERSION 'v4.3.3.3(v0.8) by Pushok, povargek, iMaddy'
 
 ; create output directory if it doesn't exist
 !system 'mkdir "..\_distro_installers\"'

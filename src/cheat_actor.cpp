@@ -41,36 +41,53 @@ void cheat_actor_teleport ( struct actor_info *info, const float pos[3], int int
 }
 void check_admins()
 {
-	if ( cheat_state->_generic.cheat_panic_enabled)
-	return;
-	if(g_SAMP->iGameState != GAMESTATE_CONNECTED)
-    return;
-	if(!cheat_state->stuff.check_admins)
-	return;
-	D3DCOLOR	color = D3DCOLOR_ARGB( 0xFF, 0xFF, 0x00, 0x00 );
-	float y = pPresentParam.BackBufferHeight / 3;
-	char buf[512];
-	static DWORD Timer = GetTickCount();
-	pD3DFontFixed->PrintShadow( pPresentParam.BackBufferWidth - pD3DFontFixed->DrawLength("Admins online: ") - 10.0f, y, color, "Admins online: " );
-	//if (GetTickCount() - 1000 < cheat_state->stuff.Timer) return;
-	if(cheat_state->stuff.count > 0)
+	if (g_SAMP == NULL) return;
+	if (cheat_state->_generic.cheat_panic_enabled)
+		return;
+	if (g_SAMP->iGameState != GAMESTATE_CONNECTED)
+		return;
+	if (cheat_state->stuff.check_admins)
+		return;
+	char slot[150][256];
+	int count = 0, x = 1, y = (pPresentParam.BackBufferHeight / 2);
+	y += 20;
+	pD3DFont_sampStuff->PrintShadow(x, y, D3DCOLOR_XRGB(0, 255, 250), "Admins Online:");
+	for (int a = 0; a < SAMP_PLAYER_MAX; a++)
 	{
-		for(int i = 0; i < cheat_state->stuff.count; i++) {
-			for(int j = 0; j < SAMP_PLAYER_MAX; j++){
-				if(g_Players->pRemotePlayer[j] != NULL){
-					if(!strcmp(getPlayerName(j),cheat_state->admins_[i].admin_name)) {
-							//addMessageToChatWindow("%s", cheat_state->admins_[i].admin_name);
-							color = D3DCOLOR_ARGB( 0xFF, 0x99, 0x99, 0x99 );
-							( y ) += 1.0f + pD3DFontFixed->DrawHeight();
-							sprintf( buf, "%s", cheat_state->admins_[i].admin_name );	
-							pD3DFontFixed->PrintShadow( pPresentParam.BackBufferWidth - pD3DFontFixed->DrawLength(buf) - 10.0f, y, color, buf );
+		if (a == g_Players->sLocalPlayerID) continue;
+
+		for (int b = 0; b < 200; b++)
+		{
+			if (getPlayerName(a) == NULL || cheat_state->admins_[b].admin_name == "")
+				continue;
+			if (!strcmp(getPlayerName(a), cheat_state->admins_[b].admin_name) == 1)
+			{
+				float nose[3];
+				char themylirow[100];
+				count++;
+				if (getPlayerPos(a, nose))
+					_snprintf(themylirow, 100, "%s [%d][Level:  %d]", getPlayerName(a), a, g_Players->pRemotePlayer[a]->iScore);
+				else
+					_snprintf(themylirow, 100, "%s [%d][Level:  %d]", getPlayerName(a), a, g_Players->pRemotePlayer[a]->iScore);
+
+				if (slot[count] != 0)
+				{
+					int c = count * 20;
+					if (g_Players->pRemotePlayer[a]->iScore < 1)
+					{
+						pD3DFont_sampStuff->PrintShadow(x, y + c, D3DCOLOR_XRGB(255, 237, 0), themylirow);
+					}
+					else
+					{
+						if (getPlayerPos(a, nose))
+							pD3DFont_sampStuff->PrintShadow(x, y + c, D3DCOLOR_XRGB(27, 255, 0), themylirow);
+						else
+							pD3DFont_sampStuff->PrintShadow(x, y + c, D3DCOLOR_XRGB(255, 255, 255), themylirow);
 					}
 				}
 			}
 		}
 	}
-	//addMessageToChatWindow("Was There :)");
-	cheat_state->stuff.Timer = GetTickCount();
 }
 void cheat_handle_actor_autoaim ( struct actor_info *info, double time_diff )
 {

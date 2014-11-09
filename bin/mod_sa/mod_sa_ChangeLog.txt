@@ -2,6 +2,7 @@ mod_sa
 by notaplane, jflm, nuckfuts, FYP, povargek, Pushok, iMaddy and the game modification community
 updated for 0.3x by FYP (http://code.google.com/p/mod-s0beit-sa/)
 updated for 0.3z by povargek, Pushok, iMaddy (http://cheat-master.ru)
+updated for SA:MP 0.3z-R2 by povargek
 
 
 Version 4.3.3.3

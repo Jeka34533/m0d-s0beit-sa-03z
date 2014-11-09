@@ -66,6 +66,7 @@ struct gui
 struct settings
 {
 	int						run_mode;
+	int						useuserfont;
 	int						wine_compatibility;
 	int						i_have_edited_the_ini_file;
 	int						basic_mode;

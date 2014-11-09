@@ -295,8 +295,15 @@ static void ini_init ( void )
 
 	if ( (ent = ini_register_entry("run_mode", TYPE_INT)) != NULL )
 		ini_register_data( ent, &set.run_mode, "1" );
-	if ( (ent = ini_register_entry("wine_compatibility", TYPE_BOOL)) != NULL )
-		ini_register_data( ent, &set.wine_compatibility, "false" );
+
+	if ( (ent = ini_register_entry("useuserfont", TYPE_BOOL)) != NULL )
+		ini_register_data(ent, &set.useuserfont, "false");
+
+	if ((ent = ini_register_entry("fontname", TYPE_STRING)) != NULL)
+		ini_register_data(ent, &fontname, "Arial");
+
+	if ((ent = ini_register_entry("wine_compatibility", TYPE_BOOL)) != NULL)
+		ini_register_data(ent, &set.wine_compatibility, "false");
 
 	if ( (ent = ini_register_entry("i_have_edited_the_ini_file", TYPE_BOOL)) != NULL )
 		ini_register_data( ent, &set.i_have_edited_the_ini_file, "false" );

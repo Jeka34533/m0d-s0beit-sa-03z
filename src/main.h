@@ -30,8 +30,8 @@
 
 #define M0D_FOLDER		"mod_sa\\"
 #define M0D_NAME		"mod_sa"
-#define M0D_VERSION		"4.3.3.3(v0.7 R1-2) by Pushok, Голубь(povargek), iMaddy. Для cheat-master.ru"
-#define SAMP_VERSION	"SA:MP 0.3z"
+#define M0D_VERSION		"4.3.3.3(v0.8) by Pushok, Голубь(povargek), iMaddy. Для cheat-master.ru"
+#define SAMP_VERSION	"SA:MP 0.3z-R2"
 #define M0D_DEV_ADVANCEDINFO
 
 // Use this to activate the SQLite Vehicle Recording.
@@ -234,6 +234,7 @@ extern FILE						*g_flLogAll;
 extern char						g_szLastFunc[256];
 extern uint32_t					g_dwSAMP_Addr;
 extern char						g_szSAMPVer[16];
+extern char						*fontname;
 extern CSettingsSAInterface		*g_pCSettingsSAInterface;
 extern D3DPRESENT_PARAMETERS	*g_pGTAPresent;
 extern RsGlobalType				*g_RsGlobal;
