@@ -3876,7 +3876,20 @@ void renderHandler()
 
 				_snprintf_s(buf, sizeof(buf) - 1, "%s", cheat_state->atext);
 				pD3DFont->PrintShadow(1, pPresentParam.BackBufferHeight / 2,
-					D3DCOLOR_ARGB(alpha, 71, 255, 0), buf);
+					color, buf);
+			}
+			if (cheat_state->offatext_time > 0 && time_get() - cheat_state->offatext_time < MSEC_TO_TIME(3000))
+			{
+				uint32_t	color, alpha = 255;
+
+				if (time_get() - cheat_state->offatext_time > MSEC_TO_TIME(2000))
+					alpha -= (time_get() - cheat_state->offatext_time - MSEC_TO_TIME(2000)) * 255 / MSEC_TO_TIME(1000);
+
+				color = D3DCOLOR_ARGB(alpha, 255, 13, 0);
+
+				_snprintf_s(buf, sizeof(buf) - 1, "%s", cheat_state->offatext);
+				pD3DFont->PrintShadow(1, (pPresentParam.BackBufferHeight / 2) - 20,
+					color, buf);
 			}
 		}
 

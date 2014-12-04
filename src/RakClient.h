@@ -5,10 +5,17 @@ extern class RakClient *g_RakClient;
 typedef unsigned int RakNetTime;
 typedef long long RakNetTimeNS;
 
+enum DisconnectReasons
+{
+	PLAYER_TIMEOUT,
+	PLAYER_QUIT,
+	PLAYER_KICKBAN
+};
+
 enum RPCEnumeration
 {
 	RPC_ServerJoin = 137, // 0.3z
-	RPC_ServerQuit = 153,
+	RPC_ServerQuit = 138, // 0.3z
 	RPC_InitGame = 154,
 	RPC_ClientJoin = 0x18,
 	RPC_NPCJoin = 0xD,

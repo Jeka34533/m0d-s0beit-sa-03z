@@ -1778,7 +1778,8 @@ void HandleRPCPacketFunc( unsigned char byteRPCID, RPCParameters *rpcParams, voi
 		int len = rpcParams ? rpcParams->numberOfBitsOfData / 8 : 0;
 		addMessageToChatWindow( "> [RPC Recv] id: %d, func offset: %p, len: %d", byteRPCID, (DWORD)functionPointer - g_dwSAMP_Addr, len );
 	}*/
-	if (byteRPCID == RPC_ServerJoin && rpcParams)
+
+	if (rpcParams)
 	{
 		if (!cheat_state->_generic.cheat_panic_enabled)
 		{
@@ -1786,22 +1787,46 @@ void HandleRPCPacketFunc( unsigned char byteRPCID, RPCParameters *rpcParams, voi
 			{
 				if (cheat_state->stuff.check_admins == 0)
 				{
-					BitStream bsData(rpcParams->input, (rpcParams->numberOfBitsOfData / 8) + 1, false);
-					CHAR szPlayerName[24];
-					USHORT playerId;
-					BYTE byteNameLen = 0;
-					memset_safe(szPlayerName, 0x0, sizeof(szPlayerName));
-					bsData.Read(playerId);
-					int iNPC = 0;//?
-					bsData.Read(iNPC);
-					BYTE bUnk = 0;
-					bsData.Read(bUnk);
-					bsData.Read(byteNameLen);
-					if (byteNameLen > 20 || byteNameLen < 3) return;
-					bsData.Read(szPlayerName, byteNameLen);
-					if (!strlen(szPlayerName)) return;
-					if (playerId < 0 || playerId > SAMP_PLAYER_MAX) return;
-					admin_text(" -> %s[ %d ] connect", szPlayerName, playerId);
+					if (byteRPCID == RPC_ServerJoin)
+					{
+						BitStream bsData(rpcParams->input, (rpcParams->numberOfBitsOfData / 8) + 1, false);
+						CHAR szPlayerName[24];
+						USHORT playerId;
+						BYTE byteNameLen = 0;
+						memset_safe(szPlayerName, 0x0, sizeof(szPlayerName));
+						bsData.Read(playerId);
+						int iNPC = 0;//?
+						bsData.Read(iNPC);
+						BYTE bUnk = 0;
+						bsData.Read(bUnk);
+						bsData.Read(byteNameLen);
+						if (byteNameLen > 20 || byteNameLen < 3) return;
+						bsData.Read(szPlayerName, byteNameLen);
+						if (!strlen(szPlayerName)) return;
+						if (playerId < 0 || playerId > SAMP_PLAYER_MAX) return;
+						admin_text(" -> %s[ %d ] connect", szPlayerName, playerId);
+					}
+					else if (byteRPCID == RPC_ServerQuit)
+					{
+						char szDisconnectReason[][14] =
+						{
+							{ "Timeout/Crash" },
+							{ "Quit" },
+							{ "Kick/Ban" }
+						};
+
+						BitStream bsData(rpcParams->input, (rpcParams->numberOfBitsOfData / 8) + 1, false);
+						USHORT sPlayerID;
+						BYTE byteReason;
+
+						bsData.Read(sPlayerID);
+
+						bsData.Read(byteReason);
+
+						if (sPlayerID < 0 || sPlayerID >= SAMP_PLAYER_MAX) return;
+
+						offadmin_text(" -> %s[ %d ] disconnect (%s)", getPlayerName(sPlayerID), sPlayerID, szDisconnectReason[byteReason]);
+					}
 				}
 			}
 		}

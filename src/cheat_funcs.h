@@ -451,6 +451,7 @@ uint64_t							__time_get ( void );
 // m0d functions, eventually some of this will become part of the m0d framework
 void								cheat_state_text ( const char *fmt, ... );
 void								admin_text(const char *fmt, ...);
+void								offadmin_text(const char *fmt, ...);
 void								cheat_teleport_history_save ( void );
 
 // more gta functions

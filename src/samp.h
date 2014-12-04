@@ -41,6 +41,7 @@
 #define SAMP_KILL_INFO_OFFSET			0x212AAC //0.3z R2 
 #define SAMP_INFO_OFFSET    			0x212AB8 //0.3z R2
 #define SAMP_DIALOG_INFO_OFFSET			0x212A78 //0.3z R2
+#define SAMP_MISC_INFO					0x212ACC //0.3z R2 (TODO: struct)
 
 #define SAMP_FONT_OFFSET				0xD2D40 //0.3z R2
 
@@ -160,10 +161,7 @@ struct stSampSettings
 struct stTextdraw
 {
 #pragma pack( 1 )
-	char szText[1024];
-	uint8_t unk_1025;
-	char szString[2048];
-	uint8_t unk_3073[2];  // always = 00 00  (?)
+	char szText[2403];
 	float fLetterWidth;
 	float fLetterHeight;
 	DWORD dwLetterColor;
@@ -183,6 +181,17 @@ struct stTextdraw
 	uint8_t unk[3]; // 00 00 00
 	float fX;
 	float fY;
+	DWORD unk_9A3;
+	uint8_t unk_9A7;
+	WORD unk_9A8;
+	DWORD unk_9AA;
+	DWORD unk_9AE;
+	DWORD unk_9B2;
+	DWORD unk_9B6;
+	WORD unk_9BA;
+	WORD unk_9BC;
+	uint8_t unk_9BE[2];
+	uint8_t unk_9C0;
 };
 
 struct stTextdrawPool
@@ -509,15 +518,15 @@ struct stSAMPPed
 	uint8_t				byteUnknown2[600]; // + 76
 	struct actor_info	*pGTA_Ped; // + 676
 	uint8_t				byteUnknown3[22]; // + 680
-	uint8_t				byteKeysId; // + 726
-	uint16_t			ulGTA_UrinateParticle_ID; // + 727
+	uint8_t				byteKeysId; // + 701
+	uint16_t			ulGTA_UrinateParticle_ID; // + 702
 	int					DrinkingOrSmoking;
 	int					object_in_hand;
-	int					drunkLevel;
+	int					drunkLevel; // +714
 	uint8_t				byteUnknown4[5];
-	int					isDancing;
-	int					danceStyle;
-	int					danceMove;
+	int					isDancing; // +722
+	int					danceStyle; // +726
+	int					danceMove; // +730
 	uint8_t				byteUnknown5[20];
 	int					isUrinating;
 };
