@@ -95,6 +95,23 @@
 
 // SAMP STRUCTURES by Pushok (0.3z R1) | SAMP STRUCTURES by povargek (0.3z R2)
 
+struct stMiscInfo
+{
+#pragma pack( 1 )
+	void			*pUnk0[3];
+	VECTOR			 vecCheckpointPos;
+	VECTOR			 vecCheckpointSize;
+	uint32_t		 iCheckpointEnabled;
+	uint16_t		 iCheckpoint_something[2];
+	VECTOR			 vecRaceCheckpointPos;
+	VECTOR			 vecRaceCheckpointNextPos; //no tested
+	uint8_t			 unk1[5];
+	uint32_t		 iRaceCheckpointEnabled;
+	uint32_t		 unk2[2];
+	BYTE			 byteCursor_something;
+	uint32_t		 unk3; // FFFFFFFF (changes on mouse click on dialog button)
+};
+
 struct stSAMPPools
 {
 #pragma pack( 1 )
